@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { Event } from '../types';
 import EventCard from '../components/EventCard.vue';
 import TicketSelector from '../components/TicketSelector.vue';
-import Cart from '../components/Cart.vue';
+import Cart from '../components/ShoppingCart.vue';
 import CartNotification from '../components/CartNotification.vue';
 import { useCartStore } from '../stores/useCartStore';
 
