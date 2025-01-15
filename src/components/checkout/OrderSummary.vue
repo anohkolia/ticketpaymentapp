@@ -10,7 +10,7 @@ defineProps<{
 
 <template>
   <div class="p-4 bg-gray-50 rounded-lg">
-    <h2 class="text-lg font-semibold mb-4">Order Summary</h2>
+    <h2 class="text-lg font-semibold mb-4">Résumé de la commande</h2>
     <div v-for="item in items" :key="item.ticketId" class="flex justify-between mb-2">
       <span>{{ item.name }} (x{{ item.quantity }})</span>
       <span>{{ formatPrice(item.price * item.quantity) }}</span>

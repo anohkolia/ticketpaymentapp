@@ -25,15 +25,15 @@ const handleCheckout = () => {
 
 <template>
   <div class="border rounded-lg p-4 bg-white">
-    <h2 class="text-xl font-bold mb-4">Shopping Cart</h2>
+    <h2 class="text-xl font-bold mb-4">Mon panier</h2>
     <div v-if="cartIsEmpty" class="text-gray-500">
-      Your cart is empty
+      Votre panier est vide
     </div>
     <div v-else class="space-y-4">
       <div v-for="item in items" :key="item.ticketId" class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
         <div>
           <h3 class="font-semibold">{{ item.name }}</h3>
-          <p class="text-sm text-gray-600">Quantity: {{ item.quantity }}</p>
+          <p class="text-sm text-gray-600">Quantité: {{ item.quantity }}</p>
         </div>
         <div class="flex items-center justify-between sm:justify-end gap-4">
           <span>{{ formatPrice(calculateTotal(item.price, item.quantity)) }}</span>
@@ -41,7 +41,7 @@ const handleCheckout = () => {
             @click="emit('remove-item', item.ticketId)"
             class="text-red-600 hover:text-red-800"
           >
-            Remove
+            Retirer
           </button>
         </div>
       </div>
@@ -54,7 +54,7 @@ const handleCheckout = () => {
           @click="handleCheckout"
           class="w-full mt-4 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-colors"
         >
-          Proceed to Checkout
+          Proceder au paiement
         </button>
       </div>
     </div>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { Event } from '../types';
+import { CartItem, Event } from '../types';
 import EventCard from '../components/EventCard.vue';
 import TicketSelector from '../components/TicketSelector.vue';
 import Cart from '../components/ShoppingCart.vue';
@@ -22,14 +22,14 @@ const event = ref<Event>({
   tickets: [
     {
       id: 't1',
-      name: 'General Admission',
+      name: 'Admission générale',
       price: 49.99,
       description: 'Access to all main stage performances',
       available: 100
     },
     {
       id: 't2',
-      name: 'VIP Pass',
+      name: 'Pass VIP',
       price: 149.99,
       description: 'Premium viewing area, exclusive lounge access, and meet & greet',
       available: 20
@@ -75,7 +75,7 @@ const handleAddToCart = (item: CartItem) => {
         @click.stop
       >
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold">Your Cart</h2>
+          <h2 class="text-xl font-bold">Votre Panier</h2>
           <button @click="showMobileCart = false" class="text-gray-500">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -94,7 +94,7 @@ const handleAddToCart = (item: CartItem) => {
         <div class="md:col-span-2 space-y-8">
           <EventCard :event="event" />
           <div class="bg-white rounded-lg shadow-md p-4">
-            <h2 class="text-xl font-bold mb-4">Select Tickets</h2>
+            <h2 class="text-xl font-bold mb-4">Sélection de billets</h2>
             <TicketSelector
               v-for="ticket in event.tickets"
               :key="ticket.id"

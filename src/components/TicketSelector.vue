@@ -49,7 +49,7 @@ const addToCart = () => {
         class="bg-blue-600 text-white px-4 py-2 rounded-lg"
         :disabled="quantity === 0"
       >
-        Add to Cart
+        Ajouter au panier
       </button>
     </div>
     <div v-if="quantity > 0" class="mt-2 text-right">

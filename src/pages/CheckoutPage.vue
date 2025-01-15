@@ -71,7 +71,7 @@ const handleSubmit = async (formValues: any) => {
         <BackButton />
       </div>
       <div class="bg-white rounded-lg shadow-md p-6">
-        <h1 class="text-2xl font-bold mb-6">Checkout</h1>
+        <h1 class="text-2xl font-bold mb-6">Commande</h1>
 
         <div class="mb-8">
           <OrderSummary
