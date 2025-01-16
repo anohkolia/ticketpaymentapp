@@ -14,10 +14,10 @@ const showMobileCart = ref(false);
 
 const event = ref<Event>({
   id: '1',
-  title: 'Summer Music Festival 2024',
-  date: 'July 15, 2024',
-  location: 'Central Park, New York',
-  description: 'Join us for an unforgettable day of music and fun!',
+  title: 'Diner Gala 2025',
+  date: 'Juillet 15, 2025 à 19h00',
+  location: 'RohazonPark, Rennes',
+  description: 'Je ne sais pas trop quoi mettre  ici, mais je suis sûr que ce sera un événement incroyable!',
   imageUrl: 'https://picsum.photos/800/400',
   tickets: [
     {
