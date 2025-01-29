@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { User } from '../types';
 
-export const userAuthStore = defineStore('auth', () => {
+export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null);
   const loading = ref(false);
   const error = ref<string | null>(null);
@@ -11,7 +11,7 @@ export const userAuthStore = defineStore('auth', () => {
     loading.value = true;
     error.value = null;
     try {
-      // Simulate API call
+      // implement your login logic here
       await new Promise((resolve) => setTimeout(resolve, 1000));
       user.value = {
         id: '1',
