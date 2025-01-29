@@ -31,3 +31,9 @@ export interface Order {
   items: CartItem[];
   total: number;
 }
+
+export interface User {
+  id: string;
+  email: string;
+  role: 'user' | 'admin';
+}
