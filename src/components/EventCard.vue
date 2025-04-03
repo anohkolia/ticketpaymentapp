@@ -7,6 +7,7 @@ defineProps<{
 }>();
 </script>
 
+<!--Composant pour afficher les détails d'un événement sous forme de carte-->
 <template>
   <div class="bg-white rounded-lg shadow-md overflow-hidden">
     <img :src="event.imageUrl" :alt="event.title" class="w-full h-48 sm:h-64 object-cover">

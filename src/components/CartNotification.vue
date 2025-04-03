@@ -18,6 +18,7 @@ watch(() => props.show, (newValue) => {
 });
 </script>
 
+<!-- Composant pour afficher une notification temporaire en bas à droite de l'écran -->
 <template>
   <transition
     enter-active-class="transform ease-out duration-300 transition"

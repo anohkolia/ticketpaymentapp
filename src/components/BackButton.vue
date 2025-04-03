@@ -8,6 +8,7 @@ const goBack = () => {
 };
 </script>
 
+<!--Composant pour bouton de retour en arrière-->
 <template>
   <button
     @click="goBack"
