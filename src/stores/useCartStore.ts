@@ -1,6 +1,8 @@
 import { reactive, computed } from 'vue';
 import { CartItem } from '../types';
 
+// classe pour gérer l'état du panier d'achats
+
 const state = reactive({
   items: [] as CartItem[]
 });

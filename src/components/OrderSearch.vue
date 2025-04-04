@@ -16,6 +16,8 @@ const handleSearch = () => {
 };
 </script>
 
+<!-- Composant pour rechercher des commandes par nom, email ou ID de commande -->
+
 <template>
   <div class="mb-8">
     <div class="flex gap-4 mb-6">

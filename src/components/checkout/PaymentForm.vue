@@ -1,3 +1,4 @@
+<!-- Composant pour le formulaire de paiement -->
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
 import * as yup from 'yup';
@@ -39,6 +40,8 @@ const onSubmit = handleSubmit((formValues) => {
   emit('submit', formValues);
 });
 </script>
+
+<!-- Composant pour le formulaire de paiement -->
 
 <template>
   <form @submit="onSubmit" class="space-y-6">

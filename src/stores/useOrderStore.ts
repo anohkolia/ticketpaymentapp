@@ -1,6 +1,9 @@
 import { reactive, computed } from 'vue';
 import type { Order } from '../types';
 
+// Classe pour gérer l'état des commandes de l'utilisateur
+// Cette classe est responsable de la gestion des commandes dans l'application
+
 const state = reactive({
   orders: [] as Order[]
 });

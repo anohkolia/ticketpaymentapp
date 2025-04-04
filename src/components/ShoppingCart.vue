@@ -23,6 +23,8 @@ const handleCheckout = () => {
 };
 </script>
 
+<!--Composant pour afficher le panier d'achats-->
+
 <template>
   <div class="border rounded-lg p-4 bg-white">
     <h2 class="text-xl font-bold mb-4">Mon panier</h2>

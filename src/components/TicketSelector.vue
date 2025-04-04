@@ -23,6 +23,8 @@ const addToCart = () => {
 };
 </script>
 
+<!-- Composant pour sélectionner un ticket avec quantité et prix -->
+
 <template>
   <div class="border rounded-lg p-4 mb-4">
     <div class="flex justify-between items-center mb-2">

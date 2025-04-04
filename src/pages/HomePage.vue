@@ -16,8 +16,7 @@ const goToEvents = () => {
     </p>
     <button
       @click="goToEvents"
-      class="bg-[#186a3b] text-white px-6 py-3 rounded-lg hover:bg-opacity-90"
-    >
+      class="bg-[#186a3b] text-white px-6 py-3 rounded-lg hover:bg-opacity-90 uppercase font-bold transition duration-300">
       Plus d'événements
     </button>
   </div>

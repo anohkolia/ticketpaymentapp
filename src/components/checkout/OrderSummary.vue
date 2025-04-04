@@ -8,6 +8,8 @@ defineProps<{
 }>();
 </script>
 
+<!-- Composant pour afficher le résumé de la commande -->
+
 <template>
   <div class="p-4 bg-gray-50 rounded-lg">
     <h2 class="text-lg font-semibold mb-4">Résumé de la commande</h2>

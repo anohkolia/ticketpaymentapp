@@ -1,6 +1,9 @@
+
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { User } from '../types';
+
+// Classe d'authentification de l'administateur
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null);

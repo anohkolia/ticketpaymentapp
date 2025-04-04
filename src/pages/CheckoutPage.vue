@@ -64,6 +64,8 @@ const handleSubmit = async (formValues: any) => {
 };
 </script>
 
+<!-- Composant de la page de commande -->
+
 <template>
   <div class="min-h-screen bg-gray-100 py-8">
     <div class="max-w-2xl mx-auto px-4">
