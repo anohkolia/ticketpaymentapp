@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { CartItem } from '../types';
+import type { CartItem } from '../types';
 import { formatPrice, calculateTotal } from '../utils/price';
 
 const router = useRouter();

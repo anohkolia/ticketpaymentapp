@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
+import { useRouter } from 'vue-router'
 
-const router = useRouter();
+const router = useRouter()
 
 const goBack = () => {
-  router.back();
-};
+  router.back()
+}
 </script>
 
 <!--Composant pour bouton de retour en arrière-->
@@ -14,12 +14,7 @@ const goBack = () => {
     @click="goBack"
     class="inline-flex items-center text-gray-600 hover:text-gray-800 transition-colors"
   >
-    <svg
-      class="w-5 h-5 mr-2"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
+    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path
         stroke-linecap="round"
         stroke-linejoin="round"

@@ -41,7 +41,7 @@ const handleSubmit = async () => {
 
       <div class="mb-6">
         <label for="password" class="block text-sm font-medium text-gray-700 mb-1">
-          Password
+          Mot de passe
         </label>
         <input
           id="password"

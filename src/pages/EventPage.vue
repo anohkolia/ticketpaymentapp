@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { CartItem, Event } from '../types';
+import type { CartItem, Event } from '../types/index.ts';
 import EventCard from '../components/EventCard.vue';
 import TicketSelector from '../components/TicketSelector.vue';
 import Cart from '../components/ShoppingCart.vue';

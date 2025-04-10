@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { Ticket } from '../types';
+import { type Ticket } from '../types';
 import { formatPrice, calculateTotal } from '../utils/price';
 
 const props = defineProps<{

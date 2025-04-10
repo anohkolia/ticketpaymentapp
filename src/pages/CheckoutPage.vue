@@ -40,6 +40,7 @@ const handleSubmit = async (formValues: any) => {
       customerName: `${formValues.firstName} ${formValues.lastName}`,
       email: formValues.email,
       items: cartStore.items.value,
+      quantity: cartStore.items.value.reduce((sum, item) => sum + item.quantity, 0),
       total: cartStore.total.value
     };
 

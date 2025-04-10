@@ -1,5 +1,5 @@
 import { reactive, computed } from 'vue';
-import { CartItem } from '../types';
+import type { CartItem } from '../types';
 
 // classe pour gérer l'état du panier d'achats
 

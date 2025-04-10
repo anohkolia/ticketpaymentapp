@@ -1,21 +1,24 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch } from 'vue'
 
 const props = defineProps<{
-  show: boolean;
-  message: string;
-}>();
+  show: boolean
+  message: string
+}>()
 
-const isVisible = ref(false);
+const isVisible = ref(false)
 
-watch(() => props.show, (newValue) => {
-  if (newValue) {
-    isVisible.value = true;
-    setTimeout(() => {
-      isVisible.value = false;
-    }, 3000);
-  }
-});
+watch(
+  () => props.show,
+  (newValue) => {
+    if (newValue) {
+      isVisible.value = true
+      setTimeout(() => {
+        isVisible.value = false
+      }, 3000)
+    }
+  },
+)
 </script>
 
 <!-- Composant pour afficher une notification temporaire en bas à droite de l'écran -->
@@ -28,7 +31,10 @@ watch(() => props.show, (newValue) => {
     leave-from-class="opacity-100"
     leave-to-class="opacity-0"
   >
-    <div v-if="isVisible" class="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg">
+    <div
+      v-if="isVisible"
+      class="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg"
+    >
       {{ message }}
     </div>
   </transition>
