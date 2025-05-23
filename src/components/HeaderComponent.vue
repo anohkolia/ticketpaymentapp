@@ -30,7 +30,7 @@ const authStore = useAuthStore()
               Déconnexion
             </button>
           </template>
-          <router-link v-else to="/login" class="hover:text-gray-300 font-bold"
+          <router-link v-else to="/loginpage" class="hover:text-gray-300 font-bold"
             >Connexion</router-link
           >
         </li>

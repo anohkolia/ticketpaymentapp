@@ -22,7 +22,7 @@ const event = ref<Event>({
   tickets: [
     {
       id: 't1',
-      name: 'Admission générale',
+      name: 'Pass Normal',
       price: 49.99,
       description: 'Access to all main stage performances',
       available: 100
