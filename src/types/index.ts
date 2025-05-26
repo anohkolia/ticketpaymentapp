@@ -1,13 +1,13 @@
 export interface Ticket {
     id: string;
     name: string;
-    //type: string;
+    type: string;
     price: number;
     description: string;
-    //quantity: number;
+    quantity: number;
     available: number;
-    //created_at: string;
-    //event_id: string;
+    created_at: string;
+    event_id: string;
   }
   
   export interface Event {
@@ -16,7 +16,7 @@ export interface Ticket {
     date: string;
     location: string;
     description: string;
-    //created_at: string;
+    created_at: string;
     imageUrl: string;
     tickets: Ticket[];
   }

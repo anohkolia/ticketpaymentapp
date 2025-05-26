@@ -4,6 +4,7 @@ import { useEventStore } from '../../stores/event';
 import { useToast } from 'vue-toastification';
 import CreateEventForm from '../../pages/CreateEventForm.vue';
 import type { Event } from '../../types';
+import QRScanner from '../../pages/QRScanner.vue';
 
 const eventStore = useEventStore();
 const toast = useToast();
@@ -24,11 +25,11 @@ const fetchEvents = async () => {
 
     // Calcules des statistiques
     stats.value.totalEvents = events.value.length;
-    stats.value.totalTickets = events.value.reduce((acc, event) =>
-      acc + event.tickets.reduce((sum, ticket) =>
+    stats.value.totalTickets = events.value.reduce((acc, event) => 
+      acc + event.tickets.reduce((sum, ticket) => 
         sum + (ticket.quantity - ticket.available), 0), 0);
-    stats.value.totalRevenue = events.value.reduce((acc, event) =>
-      acc + event.tickets.reduce((sum, ticket) =>
+    stats.value.totalRevenue = events.value.reduce((acc, event) => 
+      acc + event.tickets.reduce((sum, ticket) => 
         sum + ((ticket.quantity - ticket.available) * ticket.price), 0), 0);
 
   } catch (error) {
@@ -85,12 +86,12 @@ onMounted(fetchEvents);
         <h3 class="text-lg font-semibold text-gray-700">Total Events</h3>
         <p class="text-3xl font-bold text-primary">{{ stats.totalEvents }}</p>
       </div>
-
+      
       <div class="bg-white rounded-lg shadow-md p-6">
         <h3 class="text-lg font-semibold text-gray-700">Total Tickets Sold</h3>
         <p class="text-3xl font-bold text-primary">{{ stats.totalTickets }}</p>
       </div>
-
+      
       <div class="bg-white rounded-lg shadow-md p-6">
         <h3 class="text-lg font-semibold text-gray-700">Total Revenue</h3>
         <p class="text-3xl font-bold text-primary">{{ stats.totalRevenue.toFixed(2) }}€</p>
@@ -104,11 +105,11 @@ onMounted(fetchEvents);
 
     <div class="bg-white rounded-lg shadow-md p-6">
       <h2 class="text-xl font-semibold mb-4">Events</h2>
-
+      
       <div v-if="loading" class="text-center py-4">
         Loading...
       </div>
-
+      
       <div v-else>
         <div class="overflow-x-auto">
           <table class="w-full">
@@ -128,18 +129,18 @@ onMounted(fetchEvents);
                 <td class="py-2">{{ new Date(event.date).toLocaleDateString() }}</td>
                 <td class="py-2">{{ event.location }}</td>
                 <td class="py-2">
-                  {{ event.tickets.reduce((sum, ticket) =>
+                  {{ event.tickets.reduce((sum, ticket) => 
                     sum + (ticket.quantity - ticket.available), 0) }}
                 </td>
                 <td class="py-2">
-                  {{ event.tickets.reduce((sum, ticket) =>
+                  {{ event.tickets.reduce((sum, ticket) => 
                     sum + ((ticket.quantity - ticket.available) * ticket.price), 0).toFixed(2) }}€
                 </td>
                 <td class="py-2">
                   <button class="text-blue-600 hover:text-blue-800 mr-2">
                     Edit
                   </button>
-                  <button
+                  <button 
                     @click="handleDeleteEvent(event.id)"
                     class="text-red-600 hover:text-red-800"
                   >

@@ -15,7 +15,7 @@ const handleSubmit = async () => {
     if (authStore.isAdmin()) {
       router.push('/admin');
     } else {
-      router.push('/events');
+      router.push('');
     }
   }
 };

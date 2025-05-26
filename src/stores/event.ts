@@ -83,8 +83,6 @@ export const useEventStore = defineStore('event', () => {
       Description: event.description,
       Date: new Date(event.date).toLocaleDateString(),
       Location: event.location,
-      'Is Online': event.is_online ? 'Yes' : 'No',
-      'Is Private': event.is_private ? 'Yes' : 'No',
       'Total Tickets': event.tickets.reduce((sum, t) => sum + t.quantity, 0),
       'Available Tickets': event.tickets.reduce((sum, t) => sum + t.available, 0)
     })));
