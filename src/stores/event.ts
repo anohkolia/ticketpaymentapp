@@ -56,7 +56,7 @@ export const useEventStore = defineStore('event', () => {
         throw new Error('Failed to delete event');
       }
 
-      // Remove the event from the local state
+      // Supprime l'événement de la liste locale
       events.value = events.value.filter(event => event.id !== eventId);
       
       return { success: true };

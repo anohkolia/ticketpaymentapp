@@ -1,7 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from '../stores/auth';
 import Home from '../pages/HomePage.vue';
 import EventPage from '../pages/EventPage.vue';
 import LoginPage from '../pages/LoginPage.vue';
+import AdminDashboard from '../pages/admin/Dashboard.vue';
 import CheckoutPage from '../pages/CheckoutPage.vue';
 import OrderConfirmation from '../pages/OrderConfirmation.vue';
 
@@ -10,6 +12,7 @@ export const router = createRouter({
   routes: [
     {
       path: '/',
+      name: 'home',
       component: Home
     },
     {
@@ -23,6 +26,12 @@ export const router = createRouter({
       component: LoginPage
     },
     {
+      path: '/admin',
+      name: 'admindashboard',
+      component: AdminDashboard,
+      meta: { requiresAdmin: true }
+    },
+    {
       path: '/checkout',
       component: CheckoutPage
     },
@@ -32,3 +41,17 @@ export const router = createRouter({
     }
   ]
 });
+
+// Protection du navigateur
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore();
+
+  if (to.meta.requiresAdmin && !authStore.isAdmin) {
+    // Si l'utilisateur n'est pas admin, redirige vers la page de connexion
+    next('/loginpage');
+  } else {
+    next();
+  }
+})
+
+export default router;

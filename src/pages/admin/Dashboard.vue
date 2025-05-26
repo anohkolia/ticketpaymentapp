@@ -22,7 +22,7 @@ const fetchEvents = async () => {
     await eventStore.fetchEvents();
     events.value = eventStore.events;
 
-    // Calculate stats
+    // Calcules des statistiques
     stats.value.totalEvents = events.value.length;
     stats.value.totalTickets = events.value.reduce((acc, event) =>
       acc + event.tickets.reduce((sum, ticket) =>

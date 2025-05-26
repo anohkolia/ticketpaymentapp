@@ -47,6 +47,7 @@
     "vite": "^6.2.4",
     "vite-plugin-vue-devtools": "^7.7.2",
     "vitest": "^3.1.1",
+    "vue-toastification": "^2.0.0-rc.5",
     "vue-tsc": "^2.2.8"
   },
   "description": "This template should help get you started developing with Vue 3 in Vite.",
