@@ -43,15 +43,15 @@ export const router = createRouter({
 });
 
 // Protection du navigateur
-// router.beforeEach((to, from, next) => {
-//   const authStore = useAuthStore();
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore();
 
-//   if (to.meta.requiresAdmin && !authStore.isAdmin) {
-//     // Si l'utilisateur n'est pas admin, redirige vers la page de connexion
-//     next('/loginpage');
-//   } else {
-//     next();
-//   }
-// })
+  if (to.meta.requiresAdmin && !authStore.isAdmin) {
+    // Si l'utilisateur n'est pas admin, redirige vers la page de connexion
+    next('/loginpage');
+  } else {
+    next();
+  }
+})
 
 export default router;

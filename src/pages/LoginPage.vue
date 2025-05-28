@@ -11,11 +11,11 @@ const password = ref('');
 
 const handleSubmit = async () => {
   await authStore.login(email.value, password.value);
-  if (authStore.user) {
+  if (authStore.isAuthenticated()) {
     if (authStore.isAdmin()) {
       router.push('/admin');
     } else {
-      router.push('');
+      router.push('/');
     }
   }
 };
