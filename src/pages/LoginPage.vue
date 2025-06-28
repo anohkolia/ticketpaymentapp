@@ -11,6 +11,8 @@ const password = ref('');
 
 const handleSubmit = async () => {
   await authStore.login(email.value, password.value);
+
+  // Attendre que l'authentification soit complète avant de rediriger
   if (authStore.isAuthenticated()) {
     if (authStore.isAdmin()) {
       router.push('/admin');
@@ -61,7 +63,7 @@ const handleSubmit = async () => {
         :disabled="authStore.loading"
         class="w-full bg-[#186a3b] text-white py-2 px-4 rounded-lg hover:bg-opacity-90 disabled:opacity-50"
       >
-        {{ authStore.loading ? 'Logging in...' : 'Login' }}
+        {{ authStore.loading ? 'Connexion en cours...' : 'Se connecter' }}
       </button>
     </form>
   </div>
