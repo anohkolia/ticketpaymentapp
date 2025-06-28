@@ -8,7 +8,8 @@ const title = ref('');
 const description = ref('');
 const date = ref('');
 const location = ref('');
-const imageUrl = ref('');
+const imageFile = ref<File | null>(null);
+const imagePreview = ref<string | null>(null);
 const tickets = ref([{ 
   name: '', 
   type: '', 
@@ -20,6 +21,66 @@ const error = ref<string | null>(null);
 const loading = ref(false);
 
 const emit = defineEmits(['created']);
+
+const handleImageUpload = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
+  
+  if (file) {
+    // Vérifier le type de fichier
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+    if (!allowedTypes.includes(file.type)) {
+      error.value = 'Veuillez sélectionner un fichier image valide (JPG, JPEG, PNG)';
+      return;
+    }
+    
+    // Vérifier la taille du fichier (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      error.value = 'La taille du fichier ne doit pas dépasser 5MB';
+      return;
+    }
+    
+    imageFile.value = file;
+    error.value = null;
+    
+    // Créer un aperçu de l'image
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      imagePreview.value = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
+const removeImage = () => {
+  imageFile.value = null;
+  imagePreview.value = null;
+  // Reset the file input
+  const fileInput = document.getElementById('imageUpload') as HTMLInputElement;
+  if (fileInput) {
+    fileInput.value = '';
+  }
+};
+
+const uploadImage = async (file: File): Promise<string> => {
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+  const filePath = `event-images/${fileName}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from('images')
+    .upload(filePath, file);
+
+  if (uploadError) {
+    throw new Error('Erreur lors du téléchargement de l\'image');
+  }
+
+  const { data } = supabase.storage
+    .from('images')
+    .getPublicUrl(filePath);
+
+  return data.publicUrl;
+};
 
 const createEvent = async () => {
   if (!authStore.user?.id) {
@@ -45,6 +106,18 @@ const createEvent = async () => {
   error.value = null;
 
   try {
+    let imageUrl = 'https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg'; // Image par défaut
+    
+    // Upload de l'image si un fichier est sélectionné
+    if (imageFile.value) {
+      try {
+        imageUrl = await uploadImage(imageFile.value);
+      } catch (uploadError) {
+        console.warn('Erreur lors du téléchargement de l\'image, utilisation de l\'image par défaut');
+        // Continue avec l'image par défaut si l'upload échoue
+      }
+    }
+
     // Créer l'événement
     const { data: event, error: eventError } = await supabase
       .from('events')
@@ -53,8 +126,8 @@ const createEvent = async () => {
         description: description.value,
         date: new Date(date.value).toISOString(),
         location: location.value,
-        image_url: imageUrl.value || 'https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg',
-        is_private: false, // Toujours défini comme événement public
+        image_url: imageUrl,
+        is_private: false,
         created_by: authStore.user.id
       })
       .select()
@@ -114,7 +187,8 @@ const resetForm = () => {
   description.value = '';
   date.value = '';
   location.value = '';
-  imageUrl.value = '';
+  imageFile.value = null;
+  imagePreview.value = null;
   tickets.value = [{ 
     name: '', 
     type: '', 
@@ -123,6 +197,12 @@ const resetForm = () => {
     description: '' 
   }];
   error.value = null;
+  
+  // Reset file input
+  const fileInput = document.getElementById('imageUpload') as HTMLInputElement;
+  if (fileInput) {
+    fileInput.value = '';
+  }
 };
 
 // Fonction pour formater la date pour l'input datetime-local
@@ -199,15 +279,36 @@ date.value = formatDateForInput();
 
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-2">
-          URL de l'image
+          Image de l'événement
         </label>
-        <input
-          v-model="imageUrl"
-          type="url"
-          placeholder="https://example.com/image.jpg"
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-        />
-        <p class="text-xs text-gray-500 mt-1">Laissez vide pour utiliser une image par défaut</p>
+        <div class="space-y-3">
+          <input
+            id="imageUpload"
+            type="file"
+            accept="image/jpeg,image/jpg,image/png"
+            @change="handleImageUpload"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+          />
+          <p class="text-xs text-gray-500">
+            Formats acceptés: JPG, JPEG, PNG (max 5MB). Laissez vide pour utiliser une image par défaut.
+          </p>
+          
+          <!-- Aperçu de l'image -->
+          <div v-if="imagePreview" class="relative inline-block">
+            <img 
+              :src="imagePreview" 
+              alt="Aperçu" 
+              class="w-32 h-24 object-cover rounded-lg border border-gray-300"
+            />
+            <button
+              type="button"
+              @click="removeImage"
+              class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
+            >
+              ×
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
