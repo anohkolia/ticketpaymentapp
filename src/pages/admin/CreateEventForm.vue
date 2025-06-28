@@ -63,23 +63,46 @@ const removeImage = () => {
 };
 
 const uploadImage = async (file: File): Promise<string> => {
-  const fileExt = file.name.split('.').pop();
-  const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
-  const filePath = `event-images/${fileName}`;
+  try {
+    // First, check if the images bucket exists, if not create it
+    const { data: buckets } = await supabase.storage.listBuckets();
+    const imagesBucket = buckets?.find(bucket => bucket.name === 'images');
+    
+    if (!imagesBucket) {
+      // Create the images bucket if it doesn't exist
+      const { error: bucketError } = await supabase.storage.createBucket('images', {
+        public: true,
+        allowedMimeTypes: ['image/jpeg', 'image/jpg', 'image/png'],
+        fileSizeLimit: 5242880 // 5MB
+      });
+      
+      if (bucketError) {
+        console.warn('Could not create images bucket:', bucketError);
+        throw new Error('Storage bucket not available');
+      }
+    }
 
-  const { error: uploadError } = await supabase.storage
-    .from('images')
-    .upload(filePath, file);
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const filePath = `event-images/${fileName}`;
 
-  if (uploadError) {
-    throw new Error('Erreur lors du téléchargement de l\'image');
+    const { error: uploadError } = await supabase.storage
+      .from('images')
+      .upload(filePath, file);
+
+    if (uploadError) {
+      throw new Error('Erreur lors du téléchargement de l\'image');
+    }
+
+    const { data } = supabase.storage
+      .from('images')
+      .getPublicUrl(filePath);
+
+    return data.publicUrl;
+  } catch (error) {
+    console.warn('Image upload failed:', error);
+    throw error;
   }
-
-  const { data } = supabase.storage
-    .from('images')
-    .getPublicUrl(filePath);
-
-  return data.publicUrl;
 };
 
 const createEvent = async () => {
