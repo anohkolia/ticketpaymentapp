@@ -11,7 +11,7 @@ const password = ref('');
 
 const handleSubmit = async () => {
   await authStore.login(email.value, password.value);
-
+  
   // Attendre que l'authentification soit complète avant de rediriger
   if (authStore.isAuthenticated()) {
     if (authStore.isAdmin()) {
