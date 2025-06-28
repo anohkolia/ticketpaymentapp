@@ -9,7 +9,6 @@ const description = ref('');
 const date = ref('');
 const location = ref('');
 const imageUrl = ref('');
-const isPrivate = ref(false);
 const tickets = ref([{ 
   name: '', 
   type: '', 
@@ -55,7 +54,7 @@ const createEvent = async () => {
         date: new Date(date.value).toISOString(),
         location: location.value,
         image_url: imageUrl.value || 'https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg',
-        is_private: isPrivate.value,
+        is_private: false, // Toujours défini comme événement public
         created_by: authStore.user.id
       })
       .select()
@@ -116,7 +115,6 @@ const resetForm = () => {
   date.value = '';
   location.value = '';
   imageUrl.value = '';
-  isPrivate.value = false;
   tickets.value = [{ 
     name: '', 
     type: '', 
@@ -211,18 +209,6 @@ date.value = formatDateForInput();
         />
         <p class="text-xs text-gray-500 mt-1">Laissez vide pour utiliser une image par défaut</p>
       </div>
-    </div>
-
-    <div class="flex items-center">
-      <input
-        v-model="isPrivate"
-        type="checkbox"
-        id="isPrivate"
-        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-      />
-      <label for="isPrivate" class="ml-2 text-sm text-gray-700">
-        Événement privé
-      </label>
     </div>
 
     <!-- Section des billets -->
