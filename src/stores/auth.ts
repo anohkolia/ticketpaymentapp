@@ -68,7 +68,7 @@ export const useAuthStore = defineStore('auth', () => {
             user.value = {
               id: newData.user.id,
               email: newData.user.email!,
-              role: newData.user.user_metadata.role || 'user'
+              role: 'admin' // Définir explicitement le rôle admin
             };
           }
           return;
@@ -85,10 +85,13 @@ export const useAuthStore = defineStore('auth', () => {
       }
 
       if (data.user) {
+        // Pour l'email admin, forcer le rôle admin
+        const role = email === 'admin@eventoffice.com' ? 'admin' : (data.user.user_metadata.role || 'user');
+        
         user.value = {
           id: data.user.id,
           email: data.user.email!,
-          role: data.user.user_metadata.role || 'user'
+          role: role
         };
       }
     } catch (err: any) {
