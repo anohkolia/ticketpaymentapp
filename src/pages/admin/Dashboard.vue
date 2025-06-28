@@ -2,9 +2,9 @@
 import { ref, onMounted } from 'vue';
 import { useEventStore } from '../../stores/event';
 import { useToast } from 'vue-toastification';
-import CreateEventForm from '../../pages/CreateEventForm.vue';
+import CreateEventForm from './CreateEventForm.vue';
 import type { Event } from '../../types';
-import QRScanner from '../../pages/QRScanner.vue';
+import QRScanner from '../QRScanner.vue';
 
 const eventStore = useEventStore();
 const toast = useToast();
@@ -67,89 +67,98 @@ onMounted(fetchEvents);
 <template>
   <div class="space-y-8">
     <div class="flex justify-between items-center">
-      <h1 class="text-3xl font-bold">Admin Dashboard</h1>
+      <h1 class="text-3xl font-bold">Tableau de Bord Admin</h1>
       <button
         @click="showCreateForm = !showCreateForm"
-        class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-opacity-90"
+        class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
       >
-        {{ showCreateForm ? 'Cancel' : 'Create Event' }}
+        {{ showCreateForm ? 'Annuler' : 'Créer un Événement' }}
       </button>
     </div>
 
-    <div v-if="showCreateForm" class="bg-white rounded-lg shadow-md p-6">
-      <h2 class="text-xl font-semibold mb-4">Create New Event</h2>
+    <!-- Formulaire de création d'événement -->
+    <div v-if="showCreateForm" class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+      <h2 class="text-xl font-semibold mb-6 text-gray-800">Créer un Nouvel Événement</h2>
       <CreateEventForm @created="handleEventCreated" />
     </div>
 
+    <!-- Statistiques -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <div class="bg-white rounded-lg shadow-md p-6">
-        <h3 class="text-lg font-semibold text-gray-700">Total Events</h3>
-        <p class="text-3xl font-bold text-primary">{{ stats.totalEvents }}</p>
+        <h3 class="text-lg font-semibold text-gray-700">Total Événements</h3>
+        <p class="text-3xl font-bold text-blue-600">{{ stats.totalEvents }}</p>
       </div>
       
       <div class="bg-white rounded-lg shadow-md p-6">
-        <h3 class="text-lg font-semibold text-gray-700">Total Tickets Sold</h3>
-        <p class="text-3xl font-bold text-primary">{{ stats.totalTickets }}</p>
+        <h3 class="text-lg font-semibold text-gray-700">Billets Vendus</h3>
+        <p class="text-3xl font-bold text-green-600">{{ stats.totalTickets }}</p>
       </div>
       
       <div class="bg-white rounded-lg shadow-md p-6">
-        <h3 class="text-lg font-semibold text-gray-700">Total Revenue</h3>
-        <p class="text-3xl font-bold text-primary">{{ stats.totalRevenue.toFixed(2) }}€</p>
+        <h3 class="text-lg font-semibold text-gray-700">Revenus Total</h3>
+        <p class="text-3xl font-bold text-purple-600">{{ stats.totalRevenue.toFixed(2) }}€</p>
       </div>
     </div>
 
+    <!-- Scanner QR -->
     <div class="bg-white rounded-lg shadow-md p-6">
-      <h2 class="text-xl font-semibold mb-4">Ticket Validation</h2>
+      <h2 class="text-xl font-semibold mb-4">Validation des Billets</h2>
       <QRScanner />
     </div>
 
+    <!-- Liste des événements -->
     <div class="bg-white rounded-lg shadow-md p-6">
-      <h2 class="text-xl font-semibold mb-4">Events</h2>
+      <h2 class="text-xl font-semibold mb-4">Événements</h2>
       
-      <div v-if="loading" class="text-center py-4">
-        Loading...
+      <div v-if="loading" class="text-center py-8">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <p class="mt-2 text-gray-600">Chargement...</p>
       </div>
       
       <div v-else>
         <div class="overflow-x-auto">
           <table class="w-full">
             <thead>
-              <tr class="border-b">
-                <th class="text-left py-2">Title</th>
-                <th class="text-left py-2">Date</th>
-                <th class="text-left py-2">Location</th>
-                <th class="text-left py-2">Tickets Sold</th>
-                <th class="text-left py-2">Revenue</th>
-                <th class="text-left py-2">Actions</th>
+              <tr class="border-b bg-gray-50">
+                <th class="text-left py-3 px-4 font-semibold">Titre</th>
+                <th class="text-left py-3 px-4 font-semibold">Date</th>
+                <th class="text-left py-3 px-4 font-semibold">Lieu</th>
+                <th class="text-left py-3 px-4 font-semibold">Billets Vendus</th>
+                <th class="text-left py-3 px-4 font-semibold">Revenus</th>
+                <th class="text-left py-3 px-4 font-semibold">Actions</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="event in events" :key="event.id" class="border-b">
-                <td class="py-2">{{ event.title }}</td>
-                <td class="py-2">{{ new Date(event.date).toLocaleDateString() }}</td>
-                <td class="py-2">{{ event.location }}</td>
-                <td class="py-2">
+              <tr v-for="event in events" :key="event.id" class="border-b hover:bg-gray-50">
+                <td class="py-3 px-4">{{ event.title }}</td>
+                <td class="py-3 px-4">{{ new Date(event.date).toLocaleDateString('fr-FR') }}</td>
+                <td class="py-3 px-4">{{ event.location }}</td>
+                <td class="py-3 px-4">
                   {{ event.tickets.reduce((sum, ticket) => 
                     sum + (ticket.quantity - ticket.available), 0) }}
                 </td>
-                <td class="py-2">
+                <td class="py-3 px-4">
                   {{ event.tickets.reduce((sum, ticket) => 
                     sum + ((ticket.quantity - ticket.available) * ticket.price), 0).toFixed(2) }}€
                 </td>
-                <td class="py-2">
-                  <button class="text-blue-600 hover:text-blue-800 mr-2">
-                    Edit
+                <td class="py-3 px-4">
+                  <button class="text-blue-600 hover:text-blue-800 mr-3 font-medium">
+                    Modifier
                   </button>
                   <button 
                     @click="handleDeleteEvent(event.id)"
-                    class="text-red-600 hover:text-red-800"
+                    class="text-red-600 hover:text-red-800 font-medium"
                   >
-                    Delete
+                    Supprimer
                   </button>
                 </td>
               </tr>
             </tbody>
           </table>
+        </div>
+        
+        <div v-if="events.length === 0" class="text-center py-8 text-gray-500">
+          Aucun événement trouvé. Créez votre premier événement !
         </div>
       </div>
     </div>
