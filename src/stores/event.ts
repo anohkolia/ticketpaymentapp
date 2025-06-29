@@ -46,13 +46,25 @@ export const useEventStore = defineStore('event', () => {
 
   const deleteEvent = async (eventId: string) => {
     try {
-      const { error: err } = await supabase
+      // D'abord supprimer les billets associés
+      const { error: ticketsError } = await supabase
+        .from('tickets')
+        .delete()
+        .eq('event_id', eventId);
+
+      if (ticketsError) {
+        console.error('Error deleting tickets:', ticketsError);
+        throw new Error('Failed to delete event tickets');
+      }
+
+      // Ensuite supprimer l'événement
+      const { error: eventError } = await supabase
         .from('events')
         .delete()
         .eq('id', eventId);
 
-      if (err) {
-        console.error('Error deleting event:', err);
+      if (eventError) {
+        console.error('Error deleting event:', eventError);
         throw new Error('Failed to delete event');
       }
 

@@ -3,12 +3,15 @@ import { ref, onMounted } from 'vue';
 import { useEventStore } from '../../stores/event';
 import { useToast } from 'vue-toastification';
 import CreateEventForm from './CreateEventForm.vue';
+import EditEventForm from './EditEventForm.vue';
 import type { Event } from '../../types';
 import QRScanner from '../QRScanner.vue';
 
 const eventStore = useEventStore();
 const toast = useToast();
 const showCreateForm = ref(false);
+const showEditForm = ref(false);
+const editingEvent = ref<Event | null>(null);
 const events = ref<Event[]>([]);
 const loading = ref(true);
 const stats = ref({
@@ -46,8 +49,21 @@ const handleEventCreated = () => {
   toast.success("Événement créé avec succès");
 };
 
+const handleEventUpdated = () => {
+  showEditForm.value = false;
+  editingEvent.value = null;
+  fetchEvents();
+  toast.success("Événement modifié avec succès");
+};
+
+const handleEditEvent = (event: Event) => {
+  editingEvent.value = event;
+  showEditForm.value = true;
+  showCreateForm.value = false;
+};
+
 const handleDeleteEvent = async (eventId: string) => {
-  if (!confirm("Êtes-vous sûr de vouloir supprimer cet événement ?")) {
+  if (!confirm("Êtes-vous sûr de vouloir supprimer cet événement ? Cette action est irréversible.")) {
     return;
   }
 
@@ -61,6 +77,15 @@ const handleDeleteEvent = async (eventId: string) => {
   }
 };
 
+const cancelEdit = () => {
+  showEditForm.value = false;
+  editingEvent.value = null;
+};
+
+const cancelCreate = () => {
+  showCreateForm.value = false;
+};
+
 onMounted(fetchEvents);
 </script>
 
@@ -69,7 +94,7 @@ onMounted(fetchEvents);
     <div class="flex justify-between items-center">
       <h1 class="text-3xl font-bold">Tableau de Bord Admin</h1>
       <button
-        @click="showCreateForm = !showCreateForm"
+        @click="showCreateForm = !showCreateForm; showEditForm = false; editingEvent = null"
         class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
       >
         {{ showCreateForm ? 'Annuler' : 'Créer un Événement' }}
@@ -78,8 +103,38 @@ onMounted(fetchEvents);
 
     <!-- Formulaire de création d'événement -->
     <div v-if="showCreateForm" class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
-      <h2 class="text-xl font-semibold mb-6 text-gray-800">Créer un Nouvel Événement</h2>
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-semibold text-gray-800">Créer un Nouvel Événement</h2>
+        <button
+          @click="cancelCreate"
+          class="text-gray-500 hover:text-gray-700"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
       <CreateEventForm @created="handleEventCreated" />
+    </div>
+
+    <!-- Formulaire de modification d'événement -->
+    <div v-if="showEditForm && editingEvent" class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-semibold text-gray-800">Modifier l'Événement</h2>
+        <button
+          @click="cancelEdit"
+          class="text-gray-500 hover:text-gray-700"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <EditEventForm 
+        :event="editingEvent" 
+        @updated="handleEventUpdated" 
+        @cancel="cancelEdit"
+      />
     </div>
 
     <!-- Statistiques -->
@@ -130,7 +185,19 @@ onMounted(fetchEvents);
             </thead>
             <tbody>
               <tr v-for="event in events" :key="event.id" class="border-b hover:bg-gray-50">
-                <td class="py-3 px-4">{{ event.title }}</td>
+                <td class="py-3 px-4">
+                  <div class="flex items-center">
+                    <img 
+                      :src="event.image_url" 
+                      :alt="event.title"
+                      class="w-12 h-12 object-cover rounded-lg mr-3"
+                    />
+                    <div>
+                      <div class="font-medium">{{ event.title }}</div>
+                      <div class="text-sm text-gray-500 truncate max-w-xs">{{ event.description }}</div>
+                    </div>
+                  </div>
+                </td>
                 <td class="py-3 px-4">{{ new Date(event.date).toLocaleDateString('fr-FR') }}</td>
                 <td class="py-3 px-4">{{ event.location }}</td>
                 <td class="py-3 px-4">
@@ -142,15 +209,20 @@ onMounted(fetchEvents);
                     sum + ((ticket.quantity - ticket.available) * ticket.price), 0).toFixed(2) }}€
                 </td>
                 <td class="py-3 px-4">
-                  <button class="text-blue-600 hover:text-blue-800 mr-3 font-medium">
-                    Modifier
-                  </button>
-                  <button 
-                    @click="handleDeleteEvent(event.id)"
-                    class="text-red-600 hover:text-red-800 font-medium"
-                  >
-                    Supprimer
-                  </button>
+                  <div class="flex space-x-2">
+                    <button 
+                      @click="handleEditEvent(event)"
+                      class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600 transition-colors"
+                    >
+                      Modifier
+                    </button>
+                    <button 
+                      @click="handleDeleteEvent(event.id)"
+                      class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
+                    >
+                      Supprimer
+                    </button>
+                  </div>
                 </td>
               </tr>
             </tbody>
