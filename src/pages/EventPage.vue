@@ -1,41 +1,25 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import type { CartItem, Event } from '../types/index.ts';
 import EventCard from '../components/EventCard.vue';
 import TicketSelector from '../components/TicketSelector.vue';
 import Cart from '../components/ShoppingCart.vue';
 import CartNotification from '../components/CartNotification.vue';
 import { useCartStore } from '../stores/useCartStore';
+import { useEventStore } from '../stores/event';
+import { useToast } from 'vue-toastification';
 
+const router = useRouter();
 const cartStore = useCartStore();
+const eventStore = useEventStore();
+const toast = useToast();
+
 const showNotification = ref(false);
 const notificationMessage = ref('');
 const showMobileCart = ref(false);
-
-const event = ref<Event>({
-  id: '1',
-  title: 'Diner Gala 2025',
-  date: 'Juillet 15, 2025 à 19h00',
-  location: 'RohazonPark, Rennes',
-  description: 'Je ne sais pas trop quoi mettre  ici, mais je suis sûr que ce sera un événement incroyable!',
-  imageUrl: 'https://picsum.photos/800/400',
-  tickets: [
-    {
-      id: 't1',
-      name: 'Pass Normal',
-      price: 49.99,
-      description: 'Access to all main stage performances',
-      available: 100
-    },
-    {
-      id: 't2',
-      name: 'Pass VIP',
-      price: 149.99,
-      description: 'Premium viewing area, exclusive lounge access, and meet & greet',
-      available: 20
-    }
-  ]
-});
+const selectedEvent = ref<Event | null>(null);
+const loading = ref(true);
 
 const handleAddToCart = (item: CartItem) => {
   cartStore.addItem(item);
@@ -45,6 +29,35 @@ const handleAddToCart = (item: CartItem) => {
     showNotification.value = false;
   }, 3000);
 };
+
+const selectEvent = (event: Event) => {
+  selectedEvent.value = event;
+};
+
+const goBackToEventsList = () => {
+  selectedEvent.value = null;
+};
+
+const fetchEvents = async () => {
+  loading.value = true;
+  try {
+    await eventStore.fetchEvents();
+    
+    // Si il n'y a qu'un seul événement, le sélectionner automatiquement
+    if (eventStore.events.length === 1) {
+      selectedEvent.value = eventStore.events[0];
+    }
+  } catch (error) {
+    console.error('Error fetching events:', error);
+    toast.error('Erreur lors du chargement des événements');
+  } finally {
+    loading.value = false;
+  }
+};
+
+onMounted(() => {
+  fetchEvents();
+});
 </script>
 
 <template>
@@ -90,19 +103,119 @@ const handleAddToCart = (item: CartItem) => {
     </div>
 
     <div class="max-w-7xl mx-auto px-4">
-      <div class="grid md:grid-cols-3 gap-8">
+      <!-- Loading State -->
+      <div v-if="loading" class="text-center py-12">
+        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <p class="mt-4 text-gray-600">Chargement des événements...</p>
+      </div>
+
+      <!-- No Events State -->
+      <div v-else-if="eventStore.events.length === 0" class="text-center py-12">
+        <div class="bg-white rounded-lg shadow-md p-8">
+          <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 4v10m6-10v10m-6-4h6" />
+          </svg>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">Aucun événement disponible</h3>
+          <p class="text-gray-500">Il n'y a actuellement aucun événement à afficher.</p>
+        </div>
+      </div>
+
+      <!-- Events List (when no event is selected) -->
+      <div v-else-if="!selectedEvent" class="space-y-6">
+        <h1 class="text-3xl font-bold text-center mb-8">Événements Disponibles</h1>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div 
+            v-for="event in eventStore.events" 
+            :key="event.id"
+            class="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+            @click="selectEvent(event)"
+          >
+            <img 
+              :src="event.image_url" 
+              :alt="event.title" 
+              class="w-full h-48 object-cover"
+            />
+            <div class="p-4">
+              <h2 class="text-xl font-bold mb-2">{{ event.title }}</h2>
+              <p class="text-gray-600 mb-2">{{ new Date(event.date).toLocaleDateString('fr-FR', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              }) }}</p>
+              <p class="text-gray-600 mb-4">{{ event.location }}</p>
+              <p class="text-gray-700 mb-4 line-clamp-3">{{ event.description }}</p>
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-500">
+                  {{ event.tickets.length }} type{{ event.tickets.length > 1 ? 's' : '' }} de billet{{ event.tickets.length > 1 ? 's' : '' }}
+                </span>
+                <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                  Voir les billets
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Selected Event Detail View -->
+      <div v-else class="grid md:grid-cols-3 gap-8">
         <div class="md:col-span-2 space-y-8">
-          <EventCard :event="event" />
+          <!-- Back Button -->
+          <button
+            @click="goBackToEventsList"
+            class="inline-flex items-center text-gray-600 hover:text-gray-800 transition-colors mb-4"
+          >
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+            Retour aux événements
+          </button>
+
+          <!-- Event Details -->
+          <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <img 
+              :src="selectedEvent.image_url" 
+              :alt="selectedEvent.title" 
+              class="w-full h-48 sm:h-64 object-cover" 
+            />
+            <div class="p-4">
+              <h2 class="text-xl sm:text-2xl font-bold mb-2">{{ selectedEvent.title }}</h2>
+              <p class="text-gray-600 mb-2">{{ new Date(selectedEvent.date).toLocaleDateString('fr-FR', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              }) }}</p>
+              <p class="text-gray-600 mb-4">{{ selectedEvent.location }}</p>
+              <p class="text-gray-700 mb-4">{{ selectedEvent.description }}</p>
+            </div>
+          </div>
+
+          <!-- Ticket Selection -->
           <div class="bg-white rounded-lg shadow-md p-4">
             <h2 class="text-xl font-bold mb-4">Sélection de billets</h2>
+            <div v-if="selectedEvent.tickets.length === 0" class="text-center py-8 text-gray-500">
+              Aucun billet disponible pour cet événement.
+            </div>
             <TicketSelector
-              v-for="ticket in event.tickets"
+              v-else
+              v-for="ticket in selectedEvent.tickets"
               :key="ticket.id"
               :ticket="ticket"
               @add-to-cart="handleAddToCart"
             />
           </div>
         </div>
+
+        <!-- Shopping Cart (Desktop) -->
         <div class="hidden md:block">
           <div class="sticky top-8">
             <Cart
@@ -113,9 +226,20 @@ const handleAddToCart = (item: CartItem) => {
         </div>
       </div>
     </div>
+
+    <!-- Cart Notification -->
     <CartNotification
       :show="showNotification"
       :message="notificationMessage"
     />
   </div>
 </template>
+
+<style scoped>
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+</style>
