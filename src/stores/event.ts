@@ -46,7 +46,43 @@ export const useEventStore = defineStore('event', () => {
 
   const deleteEvent = async (eventId: string) => {
     try {
-      // D'abord supprimer les billets associés
+      console.log('Attempting to delete event:', eventId);
+      
+      // Vérifier d'abord si l'événement existe et appartient à l'utilisateur
+      const { data: eventCheck, error: checkError } = await supabase
+        .from('events')
+        .select('id, created_by, title')
+        .eq('id', eventId)
+        .single();
+
+      if (checkError) {
+        console.error('Error checking event:', checkError);
+        throw new Error('Événement non trouvé');
+      }
+
+      if (!eventCheck) {
+        throw new Error('Événement non trouvé');
+      }
+
+      console.log('Event found:', eventCheck);
+
+      // Supprimer d'abord les achats liés aux billets de cet événement
+      const { error: purchasesError } = await supabase
+        .from('purchases')
+        .delete()
+        .in('ticket_id', 
+          supabase
+            .from('tickets')
+            .select('id')
+            .eq('event_id', eventId)
+        );
+
+      if (purchasesError) {
+        console.warn('Warning deleting purchases:', purchasesError);
+        // Ne pas arrêter le processus si la suppression des achats échoue
+      }
+
+      // Ensuite supprimer les billets associés
       const { error: ticketsError } = await supabase
         .from('tickets')
         .delete()
@@ -54,10 +90,12 @@ export const useEventStore = defineStore('event', () => {
 
       if (ticketsError) {
         console.error('Error deleting tickets:', ticketsError);
-        throw new Error('Failed to delete event tickets');
+        throw new Error('Erreur lors de la suppression des billets');
       }
 
-      // Ensuite supprimer l'événement
+      console.log('Tickets deleted successfully');
+
+      // Enfin supprimer l'événement
       const { error: eventError } = await supabase
         .from('events')
         .delete()
@@ -65,16 +103,19 @@ export const useEventStore = defineStore('event', () => {
 
       if (eventError) {
         console.error('Error deleting event:', eventError);
-        throw new Error('Failed to delete event');
+        throw new Error('Erreur lors de la suppression de l\'événement');
       }
 
-      // Supprime l'événement de la liste locale
+      console.log('Event deleted successfully');
+
+      // Supprimer l'événement de la liste locale
       events.value = events.value.filter(event => event.id !== eventId);
       
       return { success: true };
-    } catch (err) {
-      console.error('Error deleting event:', err);
-      throw new Error('Failed to delete event');
+    } catch (err: any) {
+      console.error('Error in deleteEvent:', err);
+      error.value = err.message || 'Erreur lors de la suppression de l\'événement';
+      throw err;
     }
   };
 

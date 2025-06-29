@@ -14,6 +14,7 @@ const showEditForm = ref(false);
 const editingEvent = ref<Event | null>(null);
 const events = ref<Event[]>([]);
 const loading = ref(true);
+const deleting = ref<string | null>(null);
 const stats = ref({
   totalEvents: 0,
   totalTickets: 0,
@@ -36,7 +37,7 @@ const fetchEvents = async () => {
         sum + ((ticket.quantity - ticket.available) * ticket.price), 0), 0);
 
   } catch (error) {
-    console.error(error);
+    console.error('Error fetching events:', error);
     toast.error("Erreur lors du chargement des événements");
   } finally {
     loading.value = false;
@@ -62,18 +63,37 @@ const handleEditEvent = (event: Event) => {
   showCreateForm.value = false;
 };
 
-const handleDeleteEvent = async (eventId: string) => {
-  if (!confirm("Êtes-vous sûr de vouloir supprimer cet événement ? Cette action est irréversible.")) {
+const handleDeleteEvent = async (eventId: string, eventTitle: string) => {
+  // Confirmation avec le nom de l'événement
+  if (!confirm(`Êtes-vous sûr de vouloir supprimer l'événement "${eventTitle}" ?\n\nCette action supprimera également :\n- Tous les billets associés\n- Tous les achats liés\n\nCette action est irréversible.`)) {
     return;
   }
 
+  deleting.value = eventId;
+
   try {
+    console.log('Starting deletion process for event:', eventId);
+    
     await eventStore.deleteEvent(eventId);
-    toast.success("Événement supprimé avec succès");
-    fetchEvents();
-  } catch (error) {
-    toast.error("Erreur lors de la suppression de l'événement");
-    console.error(error);
+    
+    toast.success(`Événement "${eventTitle}" supprimé avec succès`);
+    
+    // Recharger la liste des événements
+    await fetchEvents();
+    
+  } catch (error: any) {
+    console.error('Delete event error:', error);
+    
+    // Messages d'erreur plus spécifiques
+    if (error.message.includes('foreign key')) {
+      toast.error("Impossible de supprimer l'événement : des achats sont liés à cet événement");
+    } else if (error.message.includes('permission')) {
+      toast.error("Vous n'avez pas les permissions pour supprimer cet événement");
+    } else {
+      toast.error(`Erreur lors de la suppression : ${error.message}`);
+    }
+  } finally {
+    deleting.value = null;
   }
 };
 
@@ -212,15 +232,18 @@ onMounted(fetchEvents);
                   <div class="flex space-x-2">
                     <button 
                       @click="handleEditEvent(event)"
-                      class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600 transition-colors"
+                      :disabled="deleting === event.id"
+                      class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Modifier
                     </button>
                     <button 
-                      @click="handleDeleteEvent(event.id)"
-                      class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
+                      @click="handleDeleteEvent(event.id, event.title)"
+                      :disabled="deleting === event.id"
+                      class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                     >
-                      Supprimer
+                      <span v-if="deleting === event.id" class="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-1"></span>
+                      {{ deleting === event.id ? 'Suppression...' : 'Supprimer' }}
                     </button>
                   </div>
                 </td>
